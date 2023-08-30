@@ -1,0 +1,9 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+    <Script file="src/Util.lua"/>
+    <Script file="src/Main.lua"/>
+    <Script file="src/CallStack.lua"/>
+    <Script file="src/Chat.lua"/>
+    <Script file="src/Injector.lua"/>
+    <Include file="src/source.xml"/>
+    <Script file="src/Test.lua"/>
+</Ui>

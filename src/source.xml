@@ -1,0 +1,9 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+    <Script file="MethodDecorators/Default.lua"/>
+    <Script file="MethodDecorators/Inject.lua"/>
+    <Script file="MethodDecorators/Validate.lua"/>
+    <Script file="MethodDecorators/Event.lua"/>
+    <Script file="MethodDecorators/InjectGlobals.lua"/>
+    <Script file="ClassDecorators/Injectable.lua"/>
+    <Script file="ClassDecorators/InjectField.lua"/>
+</Ui>
