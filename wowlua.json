@@ -1,0 +1,19 @@
+{
+    "name": "DecorateLib",
+    "author": "Suu",
+    "version": "1.0.0",
+    "type": "lib",
+    "description": "Provides dependency injection, function / class decoraters.",
+    "gameVersions": [
+        "wrath",
+        "retail"
+    ],
+    "srcPath": "src",
+    "destPath": "build",
+    "dependencies": {
+        "https://github.com/DomenikIrrgang/DecorateLib": "master"
+    },
+    "devDependencies": [
+        ""
+    }
+}
