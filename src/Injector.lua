@@ -1,49 +1,67 @@
 local DefaultClassMetaTable = {
     __newindex = function(class, key, value)
         if type(value) == "function" then
-
-            rawset(class, key, function(instance, ...)
-                class.MetaData.Functions[key] = class.MetaData.Functions[key] or {
-                    Class = class,
-                    OriginalFunction = function(...) end,
-                    Decorator = function(...)  return class.MetaData.Functions[key].OriginalFunction(...) end,
-                }
-                class.MetaData.Functions[key].OriginalFunction = value
-                CallStack:Push({
-                    Key = key,
-                    Class = class,
-                    Instance = instance,
-                    Function = value,
-                    Arguments = { ... }
-                })
-                local success, result = pcall(class.MetaData.Functions[key].Decorator, instance, ...)
-                if (not success) then
-                    local error_position = CallStack:Peek()
-                    DependencyInjector:Error("An error occured in", error_position.Key)
-                    DependencyInjector:Error("Error:", result)
-                else
-                    CallStack:Pop()
-                    return result
-                end
-            end)
+            InitializeClassFunction(class, key, value)
         else
             rawset(class, key, value)
         end
     end
 }
 
-function InitializeClassFunction(class, function_name, callable)
+function InitFunctionMetaData(class, function_name, callable)
+    if callable == nil then
+        callable = function() end
+    end
     class.MetaData.Functions[function_name] = class.MetaData.Functions[function_name] or {
         Class = class,
         OriginalFunction = callable,
-        Decorators = [],
+        BeforeCallHooks = {},
+        AfterCallHooks = {},
     }
+end
+
+function InitializeClassFunction(class, function_name, callable)
+    InitFunctionMetaData(class, function_name, callable)
     class.MetaData.Functions[function_name].OriginalFunction = callable
-    class[function_name] = function(...)
-        local result = nil
-        for _, decorator in pairs(class.MetaData.Functions[function_name].Decorators) do
-            decorator[1](class.MetaData.Functions[function_name].Decorator, unpack(decorator, 2, #decorator))
+    rawset(class, function_name, function(instance, ...)
+        CallStack:Push({
+            Key = function_name,
+            Class = class,
+            Instance = instance,
+            Function = callable,
+            Arguments = { ... }
+        })
+        local arguments = { ... }
+        print("Calling function " .. class.MetaData.Name .. "." .. function_name .. ".")
+        print("Arguments: ", unpack(arguments))
+        print("Functions", class.MetaData.Functions)
+        print("Functions", class.MetaData.Functions[function_name].BeforeCallHooks)
+        print("BeforeCallHooks", unpack(class.MetaData.Functions[function_name].BeforeCallHooks))
+        for _, decorator in pairs(class.MetaData.Functions[function_name].BeforeCallHooks) do
+            decorator(instance, arguments)
         end
+        local result = class.MetaData.Functions[function_name].OriginalFunction(instance, unpack(arguments))
+        for _, decorator in pairs(class.MetaData.Functions[function_name].AfterCallHooks) do
+            decorator(instance, arguments, result)
+        end
+        CallStack:Pop()
+        return result
+    end)
+end
+
+function AddClassFunctionDecorator(class, function_name, before_callback, after_callback, ...)
+    if before_callback ~= nil then
+        class.MetaData.Functions[function_name].BeforeCallHooks[#class.MetaData.Functions[function_name].BeforeCallHooks + 1] = before_callback(...)
+    end
+    if after_callback ~= nil then
+        class.MetaData.Functions[function_name].AfterCallHooks[#class.MetaData.Functions[function_name].AfterCallHooks + 1] = after_callback(...)
+    end
+end
+
+function CreateClassFunctionDecorator(before_callback, after_callback)
+    return function(class, function_name, ...)
+        InitFunctionMetaData(class, function_name)
+        AddClassFunctionDecorator(class, function_name, before_callback, after_callback, ...)
     end
 end
 
@@ -67,7 +85,6 @@ function CreateMethodDecorator(callable)
             OriginalFunction = function() end,
             Decorator = function(...)
                 print("Decorator function called for " .. class.MetaData.Name .. "." .. function_name .. ".", class.MetaData.Functions[function_name].OriginalFunction)
-                print("Apple Combatlog", Apple.OnCombatLogEvent)
                 return class.MetaData.Functions[function_name].OriginalFunction(...)
             end,
         }

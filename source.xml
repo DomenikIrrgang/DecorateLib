@@ -5,5 +5,5 @@
     <Script file="src/Chat.lua"/>
     <Script file="src/Injector.lua"/>
     <Include file="src/source.xml"/>
-    <Script file="src/Test.lua"/>
+    <Script file="src/Test2.lua"/>  
 </Ui>

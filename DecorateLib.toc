@@ -1,0 +1,7 @@
+## Interface: 11306
+## Author: Suu
+## Title: DecorateLib
+## Notes: Provides dependency injection, function / class decoraters.
+## Version: 0.1
+
+source.xml

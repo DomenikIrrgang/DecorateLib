@@ -1,7 +1,0 @@
-## Interface: 11306
-## Author: Suu
-## Title: EffusionRaidAssist [|c0000FF00Raidframes|r]
-## Notes: Raidframes for EffusionRaidAssist.
-## Version: 0.1
-
-source.xml
